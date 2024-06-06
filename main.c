@@ -44,7 +44,7 @@ void tampilkanMenuUtama();
 void tambahDataPasien();
 void ubahDataPasien();
 void hapusDataPasien();
-void cariDataPasien();
+void cariDataPasien(Data_Pasien* dataPasien, int count);
 void tambahRiwayatMedis();
 void ubahRiwayatMedis();
 void hapusRiwayatMedis();
@@ -79,10 +79,10 @@ int main() {
                 ubahDataPasien();
                 break;
             case 3:
-                hapusDataPasien();
+                hapusDataPasien(dataPasien, count);
                 break;
             case 4:
-                cariDataPasien();
+                cariDataPasien(dataPasien, count);
                 break;
             case 5:
                 tambahRiwayatMedis();
@@ -243,8 +243,45 @@ Biaya_Tindakan* readBiayaTindakan(const char* filename, int* count) {
 
 void tambahDataPasien() {}
 void ubahDataPasien() {}
-void hapusDataPasien() {}
-void cariDataPasien() {}
+
+void hapusDataPasien(Data_Pasien* dataPasien, int* count) {
+    int no_pasien;
+    printf("Masukkan nomor pasien yang ingin dihapus datanya! ");
+    scanf("%d", &no_pasien);
+
+    int i;
+    for (i = 0; i < *count; i++) {
+        if (dataPasien[i].No == no_pasien) {
+            // Shift elements to the left
+            for (int j = i; j < *count - 1; j++) {
+                dataPasien[j] = dataPasien[j + 1];
+            }
+            (*count)--;
+            return;
+        }
+    }
+    printf("Data pasien tidak ditemukan\n");
+}
+
+void cariDataPasien(Data_Pasien* dataPasien, int count) {
+    char* nama_pasien;
+    printf("Masukkan nama pasien yang ingin dicari! ");
+    fgets(nama_pasien, 50, stdin);
+
+    Data_Pasien* foundPasien;
+    for (int i = 0; i < count; i++) {
+        if (strcmp(dataPasien[i].Nama_Lengkap, nama_pasien) == 0) {
+            foundPasien = &dataPasien[i];
+            break;
+        }
+    }
+    if (foundPasien) {
+        printf("Data pasien ditemukan: %s\n", foundPasien->Nama_Lengkap);
+    } else {
+        printf("Data pasien tidak ditemukan\n");
+    }
+}
+
 void tambahRiwayatMedis() {}
 void ubahRiwayatMedis() {}
 void hapusRiwayatMedis() {}
