@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 // Maksimal jumlah pasien yang bisa di-load
-#define MAX_PASIEN 1000
+#define MAX_PASIEN 100
 
 // Struktur untuk menyimpan data pasien
 typedef struct {
@@ -41,9 +42,13 @@ Data_Pasien* readDataPasien(const char* filename, int* count);
 Riwayat_Medis_Pasien* readRiwayatMedis(const char* filename, int* count);
 Biaya_Tindakan* readBiayaTindakan(const char* filename, int* count);
 void tampilkanMenuUtama();
+void tampilkanDataPasien(Data_Pasien* dataPasien, int count);
+void tampilkanRiwayatMedis(Riwayat_Medis_Pasien* dataRiwayatMedi, int count);
+void tampilkanBiayaTindakan(Biaya_Tindakan* biayaTindakan, int count);
+void clearInputBuffer();
 void tambahDataPasien();
 void ubahDataPasien();
-void hapusDataPasien();
+void hapusDataPasien(Data_Pasien* dataPasien, int* count);
 void cariDataPasien(Data_Pasien* dataPasien, int count);
 void tambahRiwayatMedis();
 void ubahRiwayatMedis();
@@ -52,60 +57,64 @@ void cariRiwayatMedis();
 void laporanKeuangan();
 void analisisPasienPenyakit();
 void informasiKontrolPasien();
-int bacaDataPasienDariExcel(Data_Pasien *pasien, int maxPasien, const char *filename);
-void tampilkanDataPasien(Data_Pasien *pasien, int jumlahPasien);
 
 int main() {
-    int pilihan;
-    Data_Pasien pasien[MAX_PASIEN];
-    int jumlahPasien;
-
     // Load data pasien dari file CSV
-    int count;
-    Data_Pasien* dataPasien = readDataPasien("Data Pasien.csv", &count);
-    Riwayat_Medis_Pasien* riwayatMedis = readRiwayatMedis("Riwayat Medis Pasien.csv", &count);
-    Biaya_Tindakan* biayaTindakan = readBiayaTindakan("Biaya Tindakan.csv", &count);
+    int sizeDataPasien, sizeRiwayatMedis, sizeBiayaTindakan;
+    Data_Pasien* dataPasien = readDataPasien("Data Pasien.csv", &sizeDataPasien);
+    Riwayat_Medis_Pasien* riwayatMedis = readRiwayatMedis("Riwayat Datang, Diagnosis, dan Tindakan.csv", &sizeRiwayatMedis);    
+    Biaya_Tindakan* biayaTindakan = readBiayaTindakan("Biaya Tindakan.csv", &sizeBiayaTindakan);
 
+    int pilihan;
     while (1) {
         tampilkanMenuUtama();
-        printf("Masukkan pilihan Anda: ");
+        printf("Masukkan pilihan fitur yang ingin digunakan: ");
         scanf("%d", &pilihan);
+        printf("\n");
 
         switch (pilihan) {
             case 1:
-                tambahDataPasien();
+                tampilkanDataPasien(dataPasien, sizeDataPasien);
                 break;
             case 2:
-                ubahDataPasien();
+                tampilkanRiwayatMedis(riwayatMedis, sizeRiwayatMedis);
                 break;
             case 3:
-                hapusDataPasien(dataPasien, count);
-                break;
+                tampilkanBiayaTindakan(biayaTindakan, sizeBiayaTindakan);
             case 4:
-                cariDataPasien(dataPasien, count);
+                tambahDataPasien();
                 break;
             case 5:
-                tambahRiwayatMedis();
+                ubahDataPasien();
                 break;
             case 6:
-                ubahRiwayatMedis();
+                hapusDataPasien(dataPasien, &sizeDataPasien);
                 break;
             case 7:
-                hapusRiwayatMedis();
+                cariDataPasien(dataPasien, sizeDataPasien);
                 break;
             case 8:
-                cariRiwayatMedis();
+                tambahRiwayatMedis();
                 break;
             case 9:
-                laporanKeuangan();
+                ubahRiwayatMedis();
                 break;
             case 10:
-                analisisPasienPenyakit();
+                hapusRiwayatMedis();
                 break;
             case 11:
-                informasiKontrolPasien();
+                cariRiwayatMedis();
                 break;
             case 12:
+                laporanKeuangan();
+                break;
+            case 13:
+                analisisPasienPenyakit();
+                break;
+            case 14:
+                informasiKontrolPasien();
+                break;
+            case 15:
                 printf("Terima kasih telah menggunakan aplikasi ini.\n");
                 exit(0);
             default:
@@ -117,22 +126,61 @@ int main() {
 
 // Fungsi untuk menampilkan menu utama
 void tampilkanMenuUtama() {
+    printf("\n");
     printf("=== Sistem Pencatatan Pasien Klinik X ===\n");
-    printf("1. Tambah Data Pasien\n");
-    printf("2. Ubah Data Pasien\n");
-    printf("3. Hapus Data Pasien\n");
-    printf("4. Cari Data Pasien\n");
-    printf("5. Tambah Riwayat Medis\n");
-    printf("6. Ubah Riwayat Medis\n");
-    printf("7. Hapus Riwayat Medis\n");
-    printf("8. Cari Riwayat Medis\n");
-    printf("9. Laporan Keuangan\n");
-    printf("10. Analisis Pasien dan Penyakit\n");
-    printf("11. Informasi Kontrol Pasien\n");
-    printf("12. Keluar\n");
+    printf("\n");
+    printf("Selamat datang! Berikut adalah rincian fitur yang dapat digunakan:\n");
+    printf("1. Tampilkan Data Pasien\n");
+    printf("2. Tampilkan Riwayat Medis Pasien\n");
+    printf("3. Tampilkan Rincian Biaya Tindakan\n");
+    printf("4. Tambah Data Pasien\n");
+    printf("5. Ubah Data Pasien\n");
+    printf("6. Hapus Data Pasien\n");
+    printf("7. Cari Data Pasien\n");
+    printf("8. Tambah Riwayat Medis\n");
+    printf("9. Ubah Riwayat Medis\n");
+    printf("10. Hapus Riwayat Medis\n");
+    printf("11. Cari Riwayat Medis\n");
+    printf("12. Laporan Keuangan\n");
+    printf("13. Analisis Pasien dan Penyakit\n");
+    printf("14. Informasi Kontrol Pasien\n");
+    printf("15. Keluar\n");
+    printf("\n");
 }
 
 // Placeholder functions for other features (need implementation)
+
+// Fungsi untuk menampilkan data pasien
+void tampilkanDataPasien(Data_Pasien* dataPasien, int sizeDataPasien) {
+    printf("=== Data Pasien ===\n");
+    for (int i = 0; i < sizeDataPasien; i++) {
+        printf("No.: %d| Nama Lengkap: %s| Alamat: %s| Kota: %s| Tempat Lahir: %s| Tanggal Lahir: %s| Umur: %d| No. BPJS: %lld| ID Pasien: %s\n",
+         dataPasien[i].No, dataPasien[i].Nama_Lengkap, dataPasien[i].Alamat, dataPasien[i].Kota, dataPasien[i].Tempat_Lahir, dataPasien[i].Tanggal_Lahir,
+          dataPasien[i].Umur, dataPasien[i].No_BPJS, dataPasien[i].ID_Pasien);
+    }
+}
+
+// Fungsi untuk menampilkan riwayat medis pasien
+void tampilkanRiwayatMedis(Riwayat_Medis_Pasien* riwayatMedisPasien, int sizeRiwayatMedis) {
+    printf("=== Riwayat Medis Pasien ===\n");
+    for (int i = 0; i < sizeRiwayatMedis; i++) {
+        printf("No.: %d| Tanggal: %s| ID Pasien: %s| Diagnosis: %s| Tindakan: %s| Kontrol: %s| Biaya (Rp): %.2lf\n", riwayatMedisPasien[i].No, riwayatMedisPasien[i].Tanggal, riwayatMedisPasien[i].ID_Pasien, riwayatMedisPasien[i].Diagnosis, riwayatMedisPasien[i].Tindakan, riwayatMedisPasien[i].Kontrol, riwayatMedisPasien[i].Biaya);
+    }
+}
+
+// Fungsi untuk menampilkan rincian biaya tindakan
+void tampilkanBiayaTindakan(Biaya_Tindakan* biayaTindakanPasien, int sizeBiayaTindakan) {
+    printf("=== Rincian Biaya Tindakan ===\n");
+    for (int i = 0; i < sizeBiayaTindakan; i++) {
+        printf("No.: %d| Aktivitas: %s| Biaya (Rp): %.2lf\n", biayaTindakanPasien[i]. No, biayaTindakanPasien[i].Aktivitas, biayaTindakanPasien[i].Biaya);
+    }
+}
+
+// Fungsi untuk membersihkan buffer input
+void clearInputBuffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
 
 // Fungsi untuk membaca file CSV "Data Pasien.csv"
 Data_Pasien* readDataPasien(const char* filename, int* count) {
@@ -142,7 +190,7 @@ Data_Pasien* readDataPasien(const char* filename, int* count) {
         return NULL;
     }
 
-    Data_Pasien* dataPasien = (Data_Pasien*)malloc(sizeof(Data_Pasien) * 100); // allocate memory for 100 records
+    Data_Pasien* dataPasien = (Data_Pasien*)malloc(sizeof(Data_Pasien) * MAX_PASIEN);
     *count = 0;
 
     char line[1024];
@@ -183,7 +231,7 @@ Riwayat_Medis_Pasien* readRiwayatMedis(const char* filename, int* count) {
         return NULL;
     }
 
-    Riwayat_Medis_Pasien* riwayatMedis = (Riwayat_Medis_Pasien*)malloc(sizeof(Riwayat_Medis_Pasien) * 100); // allocate memory for 100 records
+    Riwayat_Medis_Pasien* riwayatMedis = (Riwayat_Medis_Pasien*)malloc(sizeof(Riwayat_Medis_Pasien) * MAX_PASIEN);
     *count = 0;
 
     char line[1024];
@@ -220,7 +268,7 @@ Biaya_Tindakan* readBiayaTindakan(const char* filename, int* count) {
         return NULL;
     }
 
-    Biaya_Tindakan* biayaTindakan = (Biaya_Tindakan*)malloc(sizeof(Biaya_Tindakan) * 100); // allocate memory for 100 records
+    Biaya_Tindakan* biayaTindakan = (Biaya_Tindakan*)malloc(sizeof(Biaya_Tindakan) * MAX_PASIEN); // allocate memory for 100 records
     *count = 0;
 
     char line[1024];
@@ -264,19 +312,26 @@ void hapusDataPasien(Data_Pasien* dataPasien, int* count) {
 }
 
 void cariDataPasien(Data_Pasien* dataPasien, int count) {
-    char* nama_pasien;
+    char nama_pasien[50];
     printf("Masukkan nama pasien yang ingin dicari! ");
-    fgets(nama_pasien, 50, stdin);
+    clearInputBuffer();  // Membersihkan buffer input
+    fgets(nama_pasien, sizeof(nama_pasien), stdin);
 
-    Data_Pasien* foundPasien;
+    nama_pasien[strcspn(nama_pasien, "\n")] = '\0'; // remove newline character
+
+    Data_Pasien* foundPasien = NULL;
     for (int i = 0; i < count; i++) {
         if (strcmp(dataPasien[i].Nama_Lengkap, nama_pasien) == 0) {
             foundPasien = &dataPasien[i];
             break;
         }
     }
+
     if (foundPasien) {
         printf("Data pasien ditemukan: %s\n", foundPasien->Nama_Lengkap);
+        printf("No.: %d| Nama Lengkap: %s| Alamat: %s| Kota: %s| Tempat Lahir: %s| Tanggal Lahir: %s| Umur: %d| No. BPJS: %lld| ID Pasien: %s\n",
+         foundPasien->No, foundPasien->Nama_Lengkap, foundPasien->Alamat, foundPasien->Kota, foundPasien->Tempat_Lahir, foundPasien->Tanggal_Lahir, 
+         foundPasien->Umur, foundPasien->No_BPJS, foundPasien->ID_Pasien);
     } else {
         printf("Data pasien tidak ditemukan\n");
     }
