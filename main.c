@@ -287,7 +287,7 @@ Biaya_Tindakan* readBiayaTindakan(const char* filename, int* count) {
 
     fclose(file);
     return biayaTindakan;
-}
+} // test
 
 void tambahDataPasien() {}
 void ubahDataPasien() {}
