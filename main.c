@@ -94,10 +94,10 @@ int main() {
                 cariDataPasien(dataPasien, sizeDataPasien);
                 break;
             case 8:
-                tambahRiwayatMedis();
+                tambahRiwayatMedis(riwayatMedis, &sizeRiwayatMedis);
                 break;
             case 9:
-                ubahRiwayatMedis();
+                ubahRiwayatMedis(riwayatMedis, sizeRiwayatMedis);
                 break;
             case 10:
                 hapusRiwayatMedis();
@@ -172,7 +172,7 @@ void tampilkanRiwayatMedis(Riwayat_Medis_Pasien* riwayatMedisPasien, int sizeRiw
 void tampilkanBiayaTindakan(Biaya_Tindakan* biayaTindakanPasien, int sizeBiayaTindakan) {
     printf("=== Rincian Biaya Tindakan ===\n");
     for (int i = 0; i < sizeBiayaTindakan; i++) {
-        printf("No.: %d| Aktivitas: %s| Biaya (Rp): %.2lf\n", biayaTindakanPasien[i]. No, biayaTindakanPasien[i].Aktivitas, biayaTindakanPasien[i].Biaya);
+        printf("No.: %d| Aktivitas: %s| Biaya (Rp): %.2lf\n", biayaTindakanPasien[i].No, biayaTindakanPasien[i].Aktivitas, biayaTindakanPasien[i].Biaya);
     }
 }
 
@@ -337,8 +337,81 @@ void cariDataPasien(Data_Pasien* dataPasien, int count) {
     }
 }
 
-void tambahRiwayatMedis() {}
-void ubahRiwayatMedis() {}
+void tambahRiwayatMedis(Riwayat_Medis_Pasien* riwayatMedis, int* count) {
+    Riwayat_Medis_Pasien riwayatBaru;
+
+    printf("Riwayat Medis Baru\n");
+    riwayatBaru.No = *count+1;
+    printf("No: %d", riwayatBaru.No);
+    
+    printf("Tanggal: ");
+    fgets(riwayatBaru.Tanggal, sizeof(riwayatBaru.Tanggal), stdin);
+    riwayatBaru.Tanggal[strcspn(riwayatBaru.Tanggal, "\n")] = '\0';
+
+    printf("ID Pasien: ");
+    fgets(riwayatBaru.ID_Pasien, sizeof(riwayatBaru.ID_Pasien), stdin);
+    riwayatBaru.ID_Pasien[strcspn(riwayatBaru.ID_Pasien, "\n")] = '\0';
+
+    printf("Diagnosis: ");
+    fgets(riwayatBaru.Diagnosis, sizeof(riwayatBaru.Diagnosis), stdin);
+    riwayatBaru.Diagnosis[strcspn(riwayatBaru.Diagnosis, "\n")] = '\0';
+
+    printf("Tindakan: ");
+    fgets(riwayatBaru.Tindakan, sizeof(riwayatBaru.Tindakan), stdin);
+    riwayatBaru.Tindakan[strcspn(riwayatBaru.Tindakan, "\n")] = '\0';
+
+    printf("Kontrol: ");
+    fgets(riwayatBaru.Kontrol, sizeof(riwayatBaru.Kontrol), stdin);
+    riwayatBaru.Kontrol[strcspn(riwayatBaru.Kontrol, "\n")] = '\0';
+
+    printf("Biaya: ");
+    scanf("%lf", &riwayatBaru.Biaya);
+    clearInputBuffer();
+
+    riwayatMedis[(*count)++] = riwayatBaru;
+
+    printf("Riwayat baru telah berhasil ditambahkan.\n");
+}
+
+void ubahRiwayatMedis(Riwayat_Medis_Pasien* riwayatMedis, int count) {
+    Riwayat_Medis_Pasien perubahan; int no; 
+    printf("Masukkan nomor riwayat medis yang akan diubah: \n");
+    scanf("%d", &no);
+    clearInputBuffer();
+
+    if (no <= 0 || no > count) {
+        printf("Nomor riwayat medis tidak valid.\n");
+        return;
+    }
+
+    printf("Tanggal: ");
+    fgets(perubahan.Tanggal, sizeof(perubahan.Tanggal), stdin);
+    perubahan.Tanggal[strcspn(perubahan.Tanggal, "\n")] = '\0';
+
+    printf("ID Pasien: ");
+    fgets(perubahan.ID_Pasien, sizeof(perubahan.ID_Pasien), stdin);
+    perubahan.ID_Pasien[strcspn(perubahan.ID_Pasien, "\n")] = '\0';
+
+    printf("Diagnosis: ");
+    fgets(perubahan.Diagnosis, sizeof(perubahan.Diagnosis), stdin);
+    perubahan.Diagnosis[strcspn(perubahan.Diagnosis, "\n")] = '\0';
+
+    printf("Tindakan: ");
+    fgets(perubahan.Tindakan, sizeof(perubahan.Tindakan), stdin);
+    perubahan.Tindakan[strcspn(perubahan.Tindakan, "\n")] = '\0';
+
+    printf("Kontrol: ");
+    fgets(perubahan.Kontrol, sizeof(perubahan.Kontrol), stdin);
+    perubahan.Kontrol[strcspn(perubahan.Kontrol, "\n")] = '\0';
+
+    printf("Biaya: ");
+    scanf("%lf", &perubahan.Biaya);
+    clearInputBuffer();
+
+    riwayatMedis[no-1] = perubahan;
+
+    printf("Riwayat medis pada nomor ke-%d telah berhasil diubah.\n", no);
+}
 void hapusRiwayatMedis() {}
 void cariRiwayatMedis() {}
 void laporanKeuangan() {}
